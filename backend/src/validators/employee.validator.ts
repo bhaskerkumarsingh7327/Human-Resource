@@ -33,6 +33,7 @@ export const employeeQuerySchema = z.object({
   search: z.string().optional(),
   departmentId: z.coerce.number().int().optional(),
   designationId: z.coerce.number().int().optional(),
+  managerId: z.coerce.number().int().optional(),
   status: z.enum(['ACTIVE', 'ON_LEAVE', 'TERMINATED', 'RESIGNED']).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),

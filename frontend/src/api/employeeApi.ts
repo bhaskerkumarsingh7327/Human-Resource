@@ -37,6 +37,7 @@ export interface CreateEmployeePayload {
   phone?: string;
   departmentId?: number;
   designationId?: number;
+  managerId?: number;
   dateOfJoining: string;
 }
 

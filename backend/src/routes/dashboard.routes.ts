@@ -7,5 +7,6 @@ const router = Router();
 
 router.use(authenticate);
 router.get('/overview', authorize('ADMIN', 'HR', 'MANAGER'), DashboardController.overview);
+router.get('/team-summary', authorize('MANAGER'), DashboardController.teamSummary);
 
 export default router;

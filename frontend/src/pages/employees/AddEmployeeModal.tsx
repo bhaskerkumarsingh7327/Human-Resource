@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { employeeApi } from '../../api/employeeApi';
 import { departmentApi } from '../../api/departmentApi';
@@ -20,11 +20,14 @@ export default function AddEmployeeModal({ onClose, onCreated }: Props) {
     lastName: '',
     departmentId: '',
     designationId: '',
+    managerId: '',
     dateOfJoining: new Date().toISOString().slice(0, 10),
   });
+  const [managerAutoFilled, setManagerAutoFilled] = useState(false);
 
   const { data: departments } = useQuery({ queryKey: ['departments'], queryFn: departmentApi.list });
   const { data: designations } = useQuery({ queryKey: ['designations'], queryFn: designationApi.list });
+  const { data: employees } = useQuery({ queryKey: ['employees-simple'], queryFn: employeeApi.listSimple });
 
   const mutation = useMutation({
     mutationFn: employeeApi.create,
@@ -35,17 +38,33 @@ export default function AddEmployeeModal({ onClose, onCreated }: Props) {
     onError: () => showToast('Could not create employee — email may already be in use', 'error'),
   });
 
+  // Auto-fill manager when department changes, based on that department's head
+  useEffect(() => {
+    if (!form.departmentId || !departments) return;
+    const dept = departments.find((d) => d.department_id === Number(form.departmentId));
+    if (dept?.head_employee_id) {
+      setForm((prev) => ({ ...prev, managerId: String(dept.head_employee_id) }));
+      setManagerAutoFilled(true);
+    } else {
+      setForm((prev) => ({ ...prev, managerId: '' }));
+      setManagerAutoFilled(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.departmentId, departments]);
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     mutation.mutate({
       ...form,
       departmentId: form.departmentId ? Number(form.departmentId) : undefined,
       designationId: form.designationId ? Number(form.designationId) : undefined,
+      managerId: form.managerId ? Number(form.managerId) : undefined,
     });
   }
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (key === 'managerId') setManagerAutoFilled(false);
   }
 
   return (
@@ -162,6 +181,27 @@ export default function AddEmployeeModal({ onClose, onCreated }: Props) {
               {designations?.map((d) => (
                 <option key={d.designation_id} value={d.designation_id}>
                   {d.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-span-2">
+            <label className="block text-xs font-medium text-slate-600 mb-1">
+              Manager{' '}
+              {managerAutoFilled && (
+                <span className="text-indigo-500 font-normal">(auto-assigned from department head)</span>
+              )}
+            </label>
+            <select
+              value={form.managerId}
+              onChange={(e) => update('managerId', e.target.value)}
+              className="w-full bg-white/70 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+            >
+              <option value="">— None —</option>
+              {employees?.map((e) => (
+                <option key={e.employee_id} value={e.employee_id}>
+                  {e.first_name} {e.last_name}
                 </option>
               ))}
             </select>

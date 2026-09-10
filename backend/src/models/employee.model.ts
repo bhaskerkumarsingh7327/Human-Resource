@@ -72,7 +72,7 @@ export const EmployeeModel = {
     return `EMP-${String(nextNumber).padStart(4, '0')}`;
   },
 
-  // --- Phase 2: listing, search/filter, CRUD ---
+  // --- listing, search/filter, CRUD ---
   async findAll(filters: EmployeeQuery): Promise<{ rows: EmployeeRow[]; total: number }> {
     const conditions: string[] = [];
     const values: unknown[] = [];
@@ -89,6 +89,10 @@ export const EmployeeModel = {
     if (filters.designationId) {
       conditions.push('e.designation_id = ?');
       values.push(filters.designationId);
+    }
+    if (filters.managerId) {
+      conditions.push('e.manager_id = ?');
+      values.push(filters.managerId);
     }
     if (filters.status) {
       conditions.push('e.employment_status = ?');
@@ -114,6 +118,14 @@ export const EmployeeModel = {
   async findById(id: number): Promise<EmployeeRow | null> {
     const [rows] = await pool.query<EmployeeRow[]>(`${BASE_SELECT} WHERE e.employee_id = ?`, [id]);
     return rows[0] ?? null;
+  },
+
+  async findByUserId(userId: number): Promise<{ employee_id: number } | null> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT employee_id FROM employees WHERE user_id = ?`,
+      [userId]
+    );
+    return (rows[0] as any) ?? null;
   },
 
   async update(id: number, fields: Record<string, unknown>): Promise<void> {
@@ -154,20 +166,9 @@ export const EmployeeModel = {
       `SELECT user_id FROM employees WHERE employee_id = ?`,
       [id]
     );
-    
     const userId = empRows[0]?.user_id;
     if (userId) {
       await pool.query(`DELETE FROM users WHERE user_id = ?`, [userId]);
     }
   },
-
-  async findByUserId(userId: number): Promise<{ employee_id: number } | null> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT employee_id FROM employees WHERE user_id = ?`,
-      [userId]
-    );
-
-    return (rows[0] as any) ?? null;
-  },
-  };
-
+};
