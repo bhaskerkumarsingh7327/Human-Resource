@@ -1,5 +1,5 @@
 import { axiosInstance } from './axiosInstance';
-import  type { ApiResponse } from '../types';
+import type { ApiResponse } from '../types';
 
 export interface DashboardOverview {
   totalEmployees: number;
@@ -10,11 +10,39 @@ export interface DashboardOverview {
   period: { month: number; year: number };
 }
 
+export interface TeamMember {
+  employee_id: number;
+  first_name: string;
+  last_name: string;
+  employment_status: string;
+}
+
+export interface TeamPendingLeave {
+  leave_request_id: number;
+  employee_name: string;
+  leave_type_name: string;
+  start_date: string;
+  end_date: string;
+  total_days: number;
+}
+
+export interface TeamSummary {
+  teamSize: number;
+  team: TeamMember[];
+  todayAttendance: { present: number; absent: number; onLeave: number };
+  pendingLeaves: TeamPendingLeave[];
+}
+
 export const dashboardApi = {
   overview: async (month?: number, year?: number) => {
     const { data } = await axiosInstance.get<ApiResponse<DashboardOverview>>('/dashboard/overview', {
       params: { month, year },
     });
+    return data.data;
+  },
+
+  teamSummary: async (): Promise<TeamSummary> => {
+    const { data } = await axiosInstance.get<ApiResponse<TeamSummary>>('/dashboard/team-summary');
     return data.data;
   },
 };

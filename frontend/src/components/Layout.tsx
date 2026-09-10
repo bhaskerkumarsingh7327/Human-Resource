@@ -5,15 +5,16 @@ import {
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { logout } from '../features/auth/authSlice';
+import type { RoleName } from '../types';
 
-const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { to: '/employees', label: 'Employees', icon: Users },
-  { to: '/departments', label: 'Departments', icon: Building2 },
-  { to: '/attendance', label: 'Attendance', icon: Clock },
-  { to: '/leaves', label: 'Leaves', icon: PlaneTakeoff },
-  { to: '/payroll', label: 'Payroll', icon: DollarSign },
-  { to: '/performance', label: 'Performance', icon: Star },
+const navItems: { to: string; label: string; icon: typeof Users; roles: RoleName[] }[] = [
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/employees', label: 'Employees', icon: Users, roles: ['ADMIN', 'HR', 'MANAGER'] },
+  { to: '/departments', label: 'Departments', icon: Building2, roles: ['ADMIN', 'HR'] },
+  { to: '/attendance', label: 'Attendance', icon: Clock, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/leaves', label: 'Leaves', icon: PlaneTakeoff, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/performance', label: 'Performance', icon: Star, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
 ];
 
 export default function Layout() {
@@ -21,6 +22,8 @@ export default function Layout() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const visibleItems = navItems.filter((item) => !user || item.roles.includes(user.role));
 
   function handleLogout() {
     dispatch(logout());
@@ -31,7 +34,6 @@ export default function Layout() {
     <div className="min-h-screen flex bg-slate-50">
       {/* Sidebar */}
       <aside className="w-64 shrink-0 bg-[#0B1120] relative overflow-hidden grain">
-        {/* Ambient glow */}
         <div className="absolute -top-24 -left-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute bottom-0 -right-24 w-64 h-64 bg-violet-600/15 rounded-full blur-[80px] pointer-events-none" />
 
@@ -48,7 +50,7 @@ export default function Layout() {
           </motion.div>
 
           <nav className="flex-1 space-y-1 relative">
-            {navItems.map((item, i) => {
+            {visibleItems.map((item, i) => {
               const isActive = location.pathname.startsWith(item.to);
               const Icon = item.icon;
               return (
@@ -94,7 +96,6 @@ export default function Layout() {
         </div>
       </aside>
 
-      {/* Content area with page transitions */}
       <main className="flex-1 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
