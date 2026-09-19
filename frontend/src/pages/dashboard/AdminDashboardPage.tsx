@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Users, CalendarCheck, PlaneTakeoff, Wallet, TrendingUp } from 'lucide-react';
+import { Users, PlaneTakeoff, Wallet, TrendingUp } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useAppSelector } from '../../app/hooks';
 import { dashboardApi } from '../../api/dashboardApi';
-import { avatarGradient } from '../../utils/avatarColor';
 
 const CHART_COLORS = ['#6366F1', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#06B6D4'];
 
@@ -27,7 +26,7 @@ function useCountUp(target: number, duration = 900) {
   return value;
 }
 
-export default function DashboardPage() {
+export default function AdminDashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard-overview'],
