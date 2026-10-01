@@ -1,105 +1,83 @@
-# HRMS ERP — Phase 1 Scaffold
+# HRMS ERP — Human Resource Management System
 
-Enterprise-style HR Management module. Phase 1 covers: project setup, database schema,
-authentication, and role-based access control (RBAC).
+A full-stack, enterprise-grade Employee Management System built with a modern tech stack, featuring role-based access control, real-time dashboards, and complete HR workflow automation.
 
-## Stack (Phase 1 delivered)
-- Node.js + Express + TypeScript
-- MySQL (mysql2, raw SQL, normalized schema)
-- JWT auth (access + refresh tokens)
-- bcrypt password hashing
-- Zod input validation
-- Centralized error handling
-- helmet + cors + rate limiting
+🔗 **Live Demo:** https://human-resource-1-5fje.onrender.com
+🔗 **Backend API:** https://human-resource-lnps.onrender.com
 
-## Folder Structure
-```
-backend/
-  src/
-    config/       # env loader, DB pool
-    database/     # schema.sql
-    models/       # raw SQL query functions per table
-    middleware/   # auth, RBAC, validation, error handler
-    validators/   # zod schemas
-    services/     # business logic
-    controllers/  # request/response glue
-    routes/       # route definitions
-    utils/        # jwt, AppError, response helpers, asyncHandler
-    types/        # shared TS types
-    app.ts        # express app config
-    server.ts     # entrypoint
-```
+---
 
-## Setup Steps
+## ✨ Features
 
-### 1. Prerequisites
-- Node.js 18+
-- MySQL 8+ running locally (or Docker)
+- **Authentication** — JWT-based login, forgot/reset password via email
+- **Role-Based Access Control** — Admin, HR, Manager, and Employee each see a tailored experience
+- **Employee Management** — CRUD, search/filter, pagination, profile photo upload
+- **Department & Designation Management** — with department-head auto-assignment
+- **Attendance** — check-in/check-out, working-hours calculation, monthly reports
+- **Leave Management** — apply, approve/reject, leave balance tracking
+- **Payroll** — salary structure, monthly payroll generation, payslips
+- **Performance Reviews** — ratings, feedback, goal tracking
+- **Role-specific Dashboards** — Admin (company-wide analytics), Manager (team view), Employee (personal view)
+- **Notifications**
 
-### 2. Create the database
-```bash
-mysql -u root -p < backend/src/database/schema.sql
-```
-This creates the `hrms_erp` database with all tables, foreign keys, and indexes,
-and seeds the 4 roles (ADMIN, HR, MANAGER, EMPLOYEE).
+## 🛠️ Tech Stack
 
-### 3. Configure environment
+**Backend:** Node.js, Express, TypeScript, MySQL (mysql2), JWT, bcrypt, Zod
+**Frontend:** React, TypeScript, Vite, Redux Toolkit, React Query, Tailwind CSS, Framer Motion, Recharts
+**Infrastructure:** Aiven (MySQL), Render (backend + static frontend hosting)
+
+## 🏗️ Architecture
+
+Backend follows a clean layered architecture:
+
+13-table normalized MySQL schema with proper foreign keys, constraints, and indexing.
+
+## 🚀 Local Setup
+
+### Backend
 ```bash
 cd backend
-cp .env.example .env
-# edit .env: set DB_PASSWORD, JWT secrets, etc.
+cp .env.example .env   # fill in DB + SMTP + JWT secrets
+npm install
+# run src/database/schema.sql against your MySQL instance
+npm run dev
 ```
 
-### 4. Install & run
+### Frontend
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
-Server starts at `http://localhost:5000`. Check `GET /health`.
 
-### 5. Test the auth flow
-```bash
-# Register (creates a user + linked employee record in one transaction)
-curl -X POST http://localhost:5000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email":"admin@company.com",
-    "password":"SuperSecure123",
-    "role":"ADMIN",
-    "firstName":"System",
-    "lastName":"Admin",
-    "dateOfJoining":"2026-01-01"
-  }'
+## 📂 Project Structure
+├── backend/
+│ ├── src/
+│ │ ├── config/ # DB, env, upload config
+│ │ ├── controllers/ # request/response handlers
+│ │ ├── services/ # business logic
+│ │ ├── models/ # SQL queries
+│ │ ├── routes/
+│ │ ├── middleware/ # auth, RBAC, validation
+│ │ └── database/ # schema.sql
+│ └── Dockerfile
+└── frontend/
+└── src/
+├── api/ # axios + per-module API functions
+├── pages/ # route-level pages per module
+├── components/ # reusable UI (Toast, ConfirmDialog, Skeletons)
+├── features/auth/ # Redux auth slice
+└── app/ # Redux store
 
-# Login
-curl -X POST http://localhost:5000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@company.com","password":"SuperSecure123"}'
+## 👤 Roles
 
-# Use returned accessToken:
-curl http://localhost:5000/api/v1/auth/me \
-  -H "Authorization: Bearer <accessToken>"
-```
+| Role | Access |
+|---|---|
+| **Admin** | Full system access |
+| **HR** | Employee, department, payroll, leave management |
+| **Manager** | Team view, leave approvals for direct reports |
+| **Employee** | Self-service: attendance, leave, payslips, reviews |
 
-## RBAC pattern (used from Phase 2 onward)
-```ts
-router.post(
-  '/employees',
-  authenticate,
-  authorize('ADMIN', 'HR'),
-  employeeController.create
-);
-```
+---
 
-## Roadmap
-- **Phase 1 (this scaffold):** Project setup, DB schema, Auth, RBAC ✅
-- **Phase 2:** Employee, Department, Designation modules (CRUD + search/filter + photo upload)
-- **Phase 3:** Attendance (check-in/out, working hours calc) + Leave management (balances, approvals)
-- **Phase 4:** Payroll (salary structure, payslip generation) + Performance reviews
-- **Phase 5:** Analytics dashboard, notifications, tests, Docker
-
-## Next step
-Tell me "Phase 2 start karo" and I'll build the Employee + Department + Designation
-modules (models, services, controllers, routes) on top of this exact same pattern —
-plus we can start the React + TypeScript + Redux Toolkit + React Query frontend
-(login page, protected routes, dashboard shell) in parallel.
+Built as a portfolio project demonstrating production-grade full-stack architecture, security practices, and deployment.
