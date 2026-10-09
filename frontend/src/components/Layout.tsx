@@ -1,16 +1,17 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutGrid, Users, Building2, Clock, PlaneTakeoff, DollarSign, Star, LogOut,
+  LayoutGrid, Users, Building2, Clock, PlaneTakeoff, DollarSign, Star, LogOut, Network,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { logout } from '../features/auth/authSlice';
-import type { RoleName } from '../types';
+import  type { RoleName } from '../types';
 
 const navItems: { to: string; label: string; icon: typeof Users; roles: RoleName[] }[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
   { to: '/employees', label: 'Employees', icon: Users, roles: ['ADMIN', 'HR', 'MANAGER'] },
   { to: '/departments', label: 'Departments', icon: Building2, roles: ['ADMIN', 'HR'] },
+  { to: '/org-chart', label: 'Org Chart', icon: Network, roles: ['ADMIN', 'HR', 'MANAGER'] },
   { to: '/attendance', label: 'Attendance', icon: Clock, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
   { to: '/leaves', label: 'Leaves', icon: PlaneTakeoff, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
   { to: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
@@ -96,6 +97,7 @@ export default function Layout() {
         </div>
       </aside>
 
+      {/* Content area with page transitions */}
       <main className="flex-1 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div

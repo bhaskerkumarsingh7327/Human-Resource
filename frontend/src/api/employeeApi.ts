@@ -1,5 +1,5 @@
 import { axiosInstance } from './axiosInstance';
-import type  { ApiResponse } from '../types';
+import type { ApiResponse } from '../types';
 
 export interface Employee {
   employee_id: number;
@@ -13,6 +13,7 @@ export interface Employee {
   department_name: string | null;
   designation_id: number | null;
   designation_title: string | null;
+  manager_id: number | null;
   employment_status: string;
   date_of_joining: string;
 }
@@ -56,6 +57,13 @@ export const employeeApi = {
       first_name: e.first_name,
       last_name: e.last_name,
     }));
+  },
+
+  listAll: async (): Promise<Employee[]> => {
+    const { data } = await axiosInstance.get<ApiResponse<EmployeeListResponse>>('/employees', {
+      params: { limit: 100 },
+    });
+    return data.data.employees;
   },
 
   getOne: async (id: number) => {

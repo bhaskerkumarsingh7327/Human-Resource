@@ -10,6 +10,7 @@ const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'));
 const EmployeeListPage = lazy(() => import('./pages/employees/EmployeeListPage'));
 const EmployeeDetailPage = lazy(() => import('./pages/employees/EmployeeDetailPage'));
 const DepartmentsPage = lazy(() => import('./pages/departments/DepartmentsPage'));
+const OrgChartPage = lazy(() => import('./pages/orgchart/OrgChartPage'));
 const AttendancePage = lazy(() => import('./pages/attendance/AttendancePage'));
 const LeavesPage = lazy(() => import('./pages/leaves/LeavesPage'));
 const PayrollPage = lazy(() => import('./pages/payroll/PayrollPage'));
@@ -38,6 +39,7 @@ function App() {
               <Route path="/employees" element={<EmployeeListPage />} />
               <Route path="/employees/:id" element={<EmployeeDetailPage />} />
               <Route path="/departments" element={<DepartmentsPage />} />
+              <Route path="/org-chart" element={<OrgChartPage />} />
               <Route path="/attendance" element={<AttendancePage />} />
               <Route path="/leaves" element={<LeavesPage />} />
               <Route path="/payroll" element={<PayrollPage />} />
